@@ -1,6 +1,7 @@
 import TelegramBot from "node-telegram-bot-api";
 
 export const commandsMap = new Map();
+export const messagesMap = new Map();
 
 export const setListOfCommands = (bot: TelegramBot) => {
     try {
@@ -106,9 +107,25 @@ export const handleBotCommands = async (bot: TelegramBot) => {
 
             const respose =
                 msg.from.language_code === "en"
-                    ? `type a prompt to generate image`
-                    : `برای تولید تصویر یک پرامپ وارد کنید`;
-            await bot.sendMessage(chatId, respose);
+                    ? `choose from these models`
+                    : `یکی از مدل ها را انتخاب کنید`;
+            await bot.sendMessage(chatId, respose, {
+                parse_mode: "MarkdownV2",
+                    reply_markup: {
+                        inline_keyboard: [
+                            [
+                                {
+                                    text: "flux-1",
+                                    callback_data: "flux",
+                                },
+                                {
+                                    text: "stable diffusion",
+                                    callback_data: "stable_diffusion",
+                                },
+                            ],
+                        ],
+                    },
+            }).then((data) => messagesMap.set(chatId, data.message_id))
         } catch (error) {
             console.log(error);
         }
