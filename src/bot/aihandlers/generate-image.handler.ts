@@ -34,7 +34,7 @@ export const handleGenerateImage = async (bot: TelegramBot) => {
         // })
         // } else {
     });
-    bot.on("message", async (msg) => {
+    bot.on("text", async (msg) => {
         message = msg.text;
         let fileName = message.trim().replace(/[\\\/:*?"<>|]/g, "_")
         let haveRes = false;

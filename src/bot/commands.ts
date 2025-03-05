@@ -2,7 +2,7 @@ import TelegramBot from "node-telegram-bot-api";
 
 export const commandsMap = new Map();
 export const messagesMap = new Map();
-
+console.log(commandsMap, messagesMap)
 export const setListOfCommands = (bot: TelegramBot) => {
     try {
         bot.setMyCommands([
