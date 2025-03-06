@@ -1,7 +1,7 @@
 import axios from "axios";
 import TelegramBot from "node-telegram-bot-api";
 import { commandsMap } from "../commands";
-import pdf from 'pdf-parse'
+import pdf from "pdf-parse";
 import {
     createReadStream,
     createWriteStream,
@@ -11,6 +11,8 @@ import {
 } from "node:fs";
 import path, { resolve } from "node:path";
 import { rejects } from "node:assert";
+import { getCtx, setCtx } from "../utils/context";
+import { handleLimit } from "../utils/handle.messagelimit";
 
 export const handleLlama3 = async (bot: TelegramBot) => {
     const dlpath = path.join(__dirname, "../../downloads/");
@@ -25,9 +27,18 @@ export const handleLlama3 = async (bot: TelegramBot) => {
                 return;
             // console.log(msg)
 
-            const res = await sendData(msg.text, "");
-            // console.log(res.data.result.response);
-            bot.sendMessage(msg.chat.id, res.data.result.response);
+            const res = await sendData(msg.text, "", msg.chat.id);
+            console.log("gg");
+            setCtx(msg.chat.id, msg.text);
+            // if (res) {
+            //     const chunks = handleLimit(res.data.result.response);
+            //     for (const chunk of chunks) {
+            //         await bot.sendMessage(msg.chat.id, chunk);
+            //         await new Promise((resolve) => setTimeout(resolve, 100));
+            //     }
+            // }
+            await bot.sendMessage(msg.chat.id, res.data.result.response);
+
         }
     });
     bot.on("document", async (msg) => {
@@ -39,15 +50,19 @@ export const handleLlama3 = async (bot: TelegramBot) => {
         );
         if (txtRegex.test(fileStringData)) {
             let buffer = readFileSync(fileStringData);
-            sendData(buffer, msg.caption).then((data) => {
+            sendData(buffer, msg.caption, msg.chat.id).then((data) => {
+                setCtx(msg.chat.id, data.data.result.response);
+
                 bot.sendMessage(msg.chat.id, data.data.result.response);
             });
-        }else if(pdfRegex.test(fileStringData)) {
-            console.log('file is pdf')
-            const buffer = readFileSync(fileStringData)
-            const {info, text} = await pdf(buffer)
-            console.log(info, text)
-            sendData(text, msg.caption).then((data) => {
+        } else if (pdfRegex.test(fileStringData)) {
+            console.log("file is pdf");
+            const buffer = readFileSync(fileStringData);
+            const { info, text } = await pdf(buffer);
+            console.log(info, text);
+            sendData(text, msg.caption, msg.chat.id).then((data) => {
+                setCtx(msg.chat.id, data.data.result.response);
+
                 bot.sendMessage(msg.chat.id, data.data.result.response);
             });
         }
@@ -56,8 +71,12 @@ export const handleLlama3 = async (bot: TelegramBot) => {
     });
 };
 
-const sendData = async (data, caption) => {
-    
+const sendData = async (data, caption, userId) => {
+    const messages = getCtx(userId);
+    // console.log("gg2")
+
+    messages ? messages.join(" ") : console.log("gg2");
+    console.log(messages);
     const dataobj = {
         messages: [
             {
@@ -66,7 +85,7 @@ const sendData = async (data, caption) => {
             },
             {
                 role: "user",
-                content: `${caption} \n ${data}`,
+                content: `${caption} \n ${messages} \n ${data}`,
             },
         ],
         max_tokens: 10000,
