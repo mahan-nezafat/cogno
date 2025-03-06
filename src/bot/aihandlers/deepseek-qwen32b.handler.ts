@@ -1,6 +1,7 @@
 import axios from "axios";
 import TelegramBot from "node-telegram-bot-api";
 import { commandsMap } from "../commands";
+import { handleLimit } from "../utils/handle.messagelimit";
 
 export const handleDeepseekQwen = async (bot: TelegramBot) => {
     bot.on("message", async (msg) => {
@@ -25,7 +26,7 @@ export const handleDeepseekQwen = async (bot: TelegramBot) => {
                         content: msg.text,
                     },
                 ],
-                max_tokens: 1000,
+                max_tokens: 10000,
             };
 
             console.log(data);
@@ -40,10 +41,15 @@ export const handleDeepseekQwen = async (bot: TelegramBot) => {
                 },
             });
             const { response, usage } = res.data.result;
-            const [think, result] = response.split("</think>");
+            // const [think, result] = response.split("</think>");
+            // console.log(response)
+            const chunks = handleLimit(response)
+            for(const chunk of chunks) {
 
-            bot.sendMessage(msg.chat.id, `--THINKIN-- \n ${think}`);
-            bot.sendMessage(msg.chat.id, result);
+                await bot.sendMessage(msg.chat.id, chunk);
+                await new Promise(resolve => setTimeout(resolve,100))
+            }
+            // bot.sendMessage(msg.chat.id, );
         }
     });
 };

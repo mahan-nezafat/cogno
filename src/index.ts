@@ -25,7 +25,8 @@ if (!token) {
     console.log("BOT_TOKEN must be provided!");
 }
 
-
+//HANDLE CONTEXT WITH REDIS
+// FIX telegram can't send more than 4096 in a message break it to more messages -- deepseekqwen
 
 const downloadPath = path.join(__dirname, "downloads");
 if (!fs.existsSync(downloadPath)) {
@@ -39,10 +40,7 @@ const bot = new TelegramBot(token, {
 
 
 
-//CREATE IMAGE GEN
-// FIX telegram can't send more than 4096 in a message break it to more messages -- deepseekqwen
 
-// // Database Connection
 
 // After bot initialization
 setListOfCommands(bot);
