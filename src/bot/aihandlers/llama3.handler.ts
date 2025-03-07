@@ -24,8 +24,8 @@ export const handleLlama3 = async (bot: TelegramBot) => {
         if (userCommand === "llama3") {
             if (
                 msg.text === "/llama3" ||
-                msg.text === "/playlist" ||
-                msg.text === "/youtube"
+                msg.text === "/generateimage" ||
+                msg.text === "/deepseekqwen"
             )
                 return;
             // console.log(msg)

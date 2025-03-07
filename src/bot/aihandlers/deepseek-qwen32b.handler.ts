@@ -10,8 +10,7 @@ export const handleDeepseekQwen = async (bot: TelegramBot) => {
         if (userCommand === "deepseekqwen") {
             if (
                 msg.text === "/llama3" ||
-                msg.text === "/playlist" ||
-                msg.text === "/youtube" ||
+                msg.text === "/generateimage" ||
                 msg.text === "/deepseekqwen"
             )
                 return;
