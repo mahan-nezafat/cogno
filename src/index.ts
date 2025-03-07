@@ -3,7 +3,7 @@ import axios from "axios";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
-import fs from "node:fs";
+import fs, { createWriteStream, writeFileSync } from "node:fs";
 import { AppDataSource } from "./data-source";
 import TelegramBot from "node-telegram-bot-api";
 import dotenv from "dotenv";
@@ -20,21 +20,22 @@ const app: Express = express();
 const port = process.env.PORT || 3000;
 
 // Bot initialization
+
 const token = process.env.BOT_TOKEN;
 if (!token) {
     console.log("BOT_TOKEN must be provided!");
 }
-
-//HANDLE CONTEXT WITH REDIS
-// FIX telegram can't send more than 4096 in a message break it to more messages -- deepseekqwen
-
+export const contextPath = path.join(__dirname, "context")
 const downloadPath = path.join(__dirname, "downloads");
 if (!fs.existsSync(downloadPath)) {
     fs.mkdirSync(downloadPath);
+}if (!fs.existsSync(contextPath)) {
+    fs.mkdirSync(contextPath);
 }
 
+
 const bot = new TelegramBot(token, {
-    // baseApiUrl: process.env.BASE_URL,
+    baseApiUrl: process.env.BASE_URL,
     polling: true,
 });
 

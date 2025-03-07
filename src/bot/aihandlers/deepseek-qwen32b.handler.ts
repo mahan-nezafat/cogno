@@ -2,6 +2,7 @@ import axios from "axios";
 import TelegramBot from "node-telegram-bot-api";
 import { commandsMap } from "../commands";
 import { handleLimit } from "../utils/handle.messagelimit";
+import { getCtx, setCtx } from "../utils/context";
 
 export const handleDeepseekQwen = async (bot: TelegramBot) => {
     bot.on("message", async (msg) => {
@@ -15,41 +16,56 @@ export const handleDeepseekQwen = async (bot: TelegramBot) => {
             )
                 return;
             // console.log(msg)
-            const data = {
-                messages: [
-                    {
-                        role: "system",
-                        content: "You are a friendly and helpful chat bot ",
-                    },
-                    {
-                        role: "user",
-                        content: msg.text,
-                    },
-                ],
-                max_tokens: 10000,
-            };
+            setCtx(msg.chat.id, msg.text, true);
 
-            console.log(data);
-            const res = await axios({
-                method: "post",
-                url: `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUD_FLARE_ID}/ai/run/@cf/deepseek-ai/deepseek-r1-distill-qwen-32b`,
-                data: JSON.stringify(data),
+            const res = await sendData(msg.text, "", msg.chat.id);
 
-                headers: {
-                    // Content-Type: "application/json",
-                    Authorization: `Bearer ${process.env.CLOUD_FLARE_API_KEY}`,
-                },
-            });
             const { response, usage } = res.data.result;
-            // const [think, result] = response.split("</think>");
-            // console.log(response)
+            console.log(response)
+            setCtx(msg.chat.id, response, false);
+            
             const chunks = handleLimit(response)
             for(const chunk of chunks) {
 
                 await bot.sendMessage(msg.chat.id, chunk);
                 await new Promise(resolve => setTimeout(resolve,100))
             }
-            // bot.sendMessage(msg.chat.id, );
+           
         }
     });
+};
+
+
+const sendData = async (data, caption, userId) => {
+    const messages = getCtx(userId);
+   
+
+    messages.join("\n");
+    
+    const dataobj = {
+        messages: [
+            {
+                role: "system",
+                content: "You are a friendly and helpful chat bot ",
+            },
+            {
+                role: "user",
+                content: `${caption} \n ${JSON.stringify(messages)} \n ${data}`,
+            },
+        ],
+        repetition_penalty: 1,
+        max_tokens: 10000,
+    };
+
+    const res = await axios({
+        method: "post",
+        url: `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUD_FLARE_ID}/ai/run/@cf/deepseek-ai/deepseek-r1-distill-qwen-32b`,
+        data: JSON.stringify(dataobj),
+
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${process.env.CLOUD_FLARE_API_KEY}`,
+        },
+    });
+    return res;
 };
