@@ -8,4 +8,5 @@ export const handleBotErrors = async (bot: TelegramBot) => {
         console.log(`got an error from webhook connection ${err}`)
 
     })
+
 }

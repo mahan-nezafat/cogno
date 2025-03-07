@@ -35,7 +35,7 @@ if (!fs.existsSync(downloadPath)) {
 
 
 const bot = new TelegramBot(token, {
-    baseApiUrl: process.env.BASE_URL,
+    // baseApiUrl: process.env.BASE_URL,
     polling: true,
 });
 
