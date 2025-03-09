@@ -25,23 +25,19 @@ const token = process.env.BOT_TOKEN;
 if (!token) {
     console.log("BOT_TOKEN must be provided!");
 }
-export const contextPath = path.join(__dirname, "context")
+export const contextPath = path.join(__dirname, "context");
 const downloadPath = path.join(__dirname, "downloads");
 if (!fs.existsSync(downloadPath)) {
     fs.mkdirSync(downloadPath);
-}if (!fs.existsSync(contextPath)) {
+}
+if (!fs.existsSync(contextPath)) {
     fs.mkdirSync(contextPath);
 }
 
-
 const bot = new TelegramBot(token, {
-    // baseApiUrl: process.env.BASE_URL,
+    baseApiUrl: process.env.BASE_URL,
     polling: true,
 });
-
-
-
-
 
 // After bot initialization
 setListOfCommands(bot);
