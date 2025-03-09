@@ -1,5 +1,6 @@
 import TelegramBot from "node-telegram-bot-api";
 import { verifyUser } from "./utils/verifyuser";
+import { deleteCtx } from "./utils/context";
 
 export const commandsMap = new Map();
 export const messagesMap = new Map();
@@ -9,7 +10,7 @@ export const setListOfCommands = (bot: TelegramBot) => {
         bot.setMyCommands([
             { command: "start", description: "start the bot" },
             { command: "about", description: "about the bot" },
-            { command: "help", description: "how to use the bot" },
+            // { command: "help", description: "how to use the bot" },
 
             { command: "llama3", description: "chat with llama3" },
             { command: "deepseekqwen", description: "deepseek qwen 2.5 32b" },
@@ -33,12 +34,12 @@ export const handleBotCommands = async (bot: TelegramBot) => {
             // const isUser = await verifyUser(bot, msg);
             const chatId = msg.chat.id;
             commandsMap.delete(chatId);
+            deleteCtx(chatId);
             const respose =
                 msg.from.language_code === "en"
                     ? `hello ${msg.chat.first_name} the bot has started.`
                     : `سلام ${msg.chat.first_name} ربات استارت شد.`;
             await bot.sendMessage(chatId, respose);
-            
         } catch (error) {
             console.log(error);
         }
@@ -76,6 +77,8 @@ export const handleBotCommands = async (bot: TelegramBot) => {
                 const chatId = msg.chat.id;
                 if (commandsMap.get(chatId) === "llama3") return;
                 commandsMap.delete(chatId);
+                deleteCtx(chatId);
+
                 commandsMap.set(chatId, "llama3");
                 console.log(commandsMap);
 
@@ -101,6 +104,7 @@ export const handleBotCommands = async (bot: TelegramBot) => {
                 const chatId = msg.chat.id;
                 if (commandsMap.get(chatId) === "deepseekqwen") return;
                 commandsMap.delete(chatId);
+                deleteCtx(chatId);
                 commandsMap.set(chatId, "deepseekqwen");
                 console.log(commandsMap);
 
@@ -126,6 +130,7 @@ export const handleBotCommands = async (bot: TelegramBot) => {
                 const chatId = msg.chat.id;
                 if (commandsMap.get(chatId) === "generateimage") return;
                 commandsMap.delete(chatId);
+                deleteCtx(chatId);
                 commandsMap.set(chatId, "generateimage");
                 console.log(commandsMap);
 

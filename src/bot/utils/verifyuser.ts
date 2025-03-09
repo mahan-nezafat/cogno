@@ -21,3 +21,4 @@ export const verifyUser = async (bot, msg): Promise<boolean> => {
         return false;
     }
 };
+    

@@ -33,9 +33,10 @@ export const handleGenerateImage = async (bot: TelegramBot) => {
     bot.on("message", async (msg) => {
         const userCommand = commandsMap.get(msg.chat.id);
         console.log(userCommand);
-
+        if(userCommand !== "generateimage") return
         if (userCommand === "generateimage") {
-            if (
+            if (msg.text === "/start" ||
+                msg.text === "/about" ||
                 msg.text === "/llama3" ||
                 msg.text === "/generateimage" ||
                 msg.text === "/deepseekqwen"

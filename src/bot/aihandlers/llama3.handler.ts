@@ -21,8 +21,10 @@ export const handleLlama3 = async (bot: TelegramBot) => {
     
     bot.on("text", async (msg) => {
         const userCommand = commandsMap.get(msg.chat.id);
+        if(userCommand !== "llama3") return
         if (userCommand === "llama3") {
-            if (
+            if (msg.text === "/start" ||
+                msg.text === "/about" ||
                 msg.text === "/llama3" ||
                 msg.text === "/generateimage" ||
                 msg.text === "/deepseekqwen"

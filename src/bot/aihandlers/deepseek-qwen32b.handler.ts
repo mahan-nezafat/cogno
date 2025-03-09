@@ -7,8 +7,10 @@ import { getCtx, setCtx } from "../utils/context";
 export const handleDeepseekQwen = async (bot: TelegramBot) => {
     bot.on("message", async (msg) => {
         const userCommand = commandsMap.get(msg.chat.id);
+        if(userCommand !== "deepseekqwen") return
         if (userCommand === "deepseekqwen") {
-            if (
+            if (msg.text === "/start" ||
+                msg.text === "/about" ||
                 msg.text === "/llama3" ||
                 msg.text === "/generateimage" ||
                 msg.text === "/deepseekqwen"
