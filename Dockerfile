@@ -8,11 +8,8 @@ RUN npm ci --only=production
 
 COPY . .
 
-# Compile TypeScript to JavaScript
-RUN npx tsc --skipLibCheck --noEmitOnError false
-
-# Production stage (distroless)
-FROM gcr.io/distroless/nodejs:18
+# Production stage
+FROM node:lts-alpine
 
 WORKDIR /app
 
@@ -20,4 +17,4 @@ COPY --from=builder /app ./
 
 EXPOSE 3000
 
-CMD ["build/index.js"]
+CMD ["npm", "start"]
