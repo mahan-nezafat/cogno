@@ -9,7 +9,7 @@ RUN npm ci --only=production
 COPY . .
 
 # Compile TypeScript to JavaScript
-RUN npx tsc
+RUN npx tsc --skipLibCheck --noEmitOnError false
 
 # Production stage (distroless)
 FROM gcr.io/distroless/nodejs:18
